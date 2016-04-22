@@ -13,9 +13,9 @@ Monster = function (given_name, life, weak_point, attack_name, attack_distance, 
     this.follow_chance = follow_per;
     this.xp = xp;
 
-    //this.get_monster_info  = "Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
-    //        "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
-    //        "\nFollow Chance: " + this.follow_chance
+    this.get_monster_info  = "Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
+            "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
+            "\nFollow Chance: " + this.follow_chance
 };
 
 //this is the function that causes the monster to lose hit points, and checks to see whether or not it has survived this round of combat.
@@ -38,14 +38,14 @@ function death_check(hp){
 }
 
 //this gets the info on the monster.
-var get_monster_info  = function() {
-    return "Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
-    "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
-    "\nFollow Chance: " + this.follow_chance
-};
+//var get_monster_info  = function() {
+//    return "Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
+//    "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
+//    "\nFollow Chance: " + this.follow_chance
+//};
 
 module.exports = {
     Monster:Monster,
     lose_hit_points:lose_hit_points,
-    get_monster_info:get_monster_info
+  //  get_monster_info:get_monster_info
 };

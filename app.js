@@ -66,19 +66,5 @@ app.use(function(err, req, res, next) {
   });
 });
 
-//this is where random monsters are created.
-//function Monster (name, hit_points, weakness, attack, attack_type, defense){
-//  this.name = name;
-//  this.hit_points = hit_points;
-//  this.weakness = weakness;
-//  this.attack = attack;
-//  this.attack_type = attack_type;
-//  this.defense = defense;
-//  this.get_monster_info = function (){
-//    return "Name: " +  this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
-//        "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense
-//  }
-//}
-
 
 module.exports = app;
