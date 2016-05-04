@@ -48,44 +48,75 @@ var client = new Twitter({
   access_token_key: key.get_access_token(),
   access_token_secret: key.get_access_secret()
 });
+//
+//client.stream('statuses/filter', {track: 'javascript'}, function(stream) {
+//  stream.on('data', function(tweet) {
+//    //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
+//    if (player_index.length == 0) {
+//
+//      //creates a new hero and adds them to the index.
+//      var hero = new_player();
+//      player_index.push(hero);
+//
+//      //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
+//      room_has_monster = new_room(hero);
+//
+//      //if the hero is
+//      if (room_has_monster){
+//        var monster = create_monster();
+//        var combat = create_room_combat();
+//        var fight = combat.room_combat(hero, monster);
+//        if (fight) {
+//          var alive = end_combat(hero, monster, combat);
+//          if (alive){
+//            room_has_monster = false;
+//          }
+//          else{
+//            player_index.pop();
+//          }
+//        }
+//      }
+//    }
+//    console.log("Player Index size: " + player_index.length);
+//    console.log("Room has monster: " + room_has_monster);
+//    console.log(tweet.text);
+//  });
+//
+//  stream.on('error', function(error) {
+//    throw error;
+//  });
+//});
 
-client.stream('statuses/filter', {track: 'javascript'}, function(stream) {
-  stream.on('data', function(tweet) {
-    //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
-    if (player_index.length == 0) {
+//this is for testing purposes. once the methods are running correctly, this should taken out for the client stream above.
+while (true) {
+//This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
+  if (player_index.length == 0) {
 
-      //creates a new hero and adds them to the index.
-      var hero = new_player();
-      player_index.push(hero);
+    //creates a new hero and adds them to the index.
+    var hero = new_player();
+    player_index.push(hero);
 
-      //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
-      room_has_monster = new_room(hero);
+    //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
+    room_has_monster = new_room(hero);
 
-      //if the hero is
-      if (room_has_monster){
-        var monster = create_monster();
-        var combat = create_room_combat();
-        var fight = combat.room_combat(hero, monster);
-        if (fight) {
-          var alive = end_combat(hero, monster, combat);
-          if (alive){
-            room_has_monster = false;
-          }
-          else{
-            player_index.pop();
-          }
+    //if the hero is
+    if (room_has_monster) {
+      var monster = create_monster();
+      var combat = create_room_combat();
+      var fight = combat.room_combat(hero, monster);
+      if (fight) {
+        var alive = end_combat(hero, monster, combat);
+        if (alive) {
+          room_has_monster = false;
+        }
+        else {
+          player_index.pop();
+          break;
         }
       }
     }
-    console.log("Player Index size: " + player_index.length);
-    console.log("Room has monster: " + room_has_monster);
-    console.log(tweet.text);
-  });
-
-  stream.on('error', function(error) {
-    throw error;
-  });
-});
+  }
+}
 
 //this pulls a random test monster.
 function random_monster (which_monster) {
