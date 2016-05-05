@@ -18,5 +18,4 @@ var monsterSchema = new Schema({
 
 var Monster = mongoose.model('Monster', monsterSchema);
 
-
 module.exports = Monster;

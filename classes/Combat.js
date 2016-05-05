@@ -2,8 +2,6 @@
  * Created by Kevin on 4/29/2016.
  */
 Combat = function(hero, monster){
-    this.hero = hero;
-    this.monster = monster;
 };
 
 //This is where the combat happens in individual rooms.
@@ -32,9 +30,9 @@ Combat.prototype.room_combat = function (hero, monster) {
     var monster_attack_roll = monster.monster_attack_roll();
     console.log("The " + monster.monster_get_name() + " rolls a " + monster_attack_roll + ".");
     if (monster_attack_roll >= hero.hero_get_defense()) {
-        console.log("The " + monster.monster_get_name() + " hit you, " + this.hero.hero_get_name() + ".");
+        console.log("The " + monster.monster_get_name() + " hit you, " + hero.hero_get_name() + ".");
         var monster_damage = monster.monster_get_attack_damage();
-        this.hero.hero_lose_hit_points(monster_damage);
+        hero.hero_lose_hit_points(monster_damage);
         if (!hero.hero_is_alive()) {
             return true;
             //return this.hero;

@@ -19,11 +19,6 @@ Hero = function (name, current_weapon, weapons_array) {
     this.defense = 7 + (3*this.level);
     this.hit_points = 11;
 };
-//
-//function get_max_hp () {
-//    console.log(this.hit_points);
-//    return this.hit_points;
-//}
 
 //this gets the basic info on the hero.
 Hero.prototype.get_hero_info  = function (){
