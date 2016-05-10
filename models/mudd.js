@@ -16,6 +16,6 @@ var monsterSchema = new Schema({
 });
 
 
-var Monster = mongoose.model('Monster', monsterSchema);
+var Monster = mongoose.model('monsters', monsterSchema);
 
 module.exports = Monster;
