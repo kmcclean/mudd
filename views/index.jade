@@ -1,5 +1,28 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  p
+    h1 Foolish mortal, I am the Evil Dungeon!!!
+  p Below are the list of heroes who have paid the price for daring to adventure into my depths.
+    .hallOfFame
+      table
+        tr
+          td Hero
+          td Score
+        for hero in highscores
+          tr #{hero.name}
+          tr #{hero.score}
+          br
+    p See the valiant fools who still struggle hopelessly!
+    .heroesPlaying
+      table
+        tr
+          td Hero
+        for hero in stillPlaying
+          tr #{hero.name}
+          br
+  hr
+  form(action='/about', method = "GET")
+    input(type="submit" name="gotoAbout" values = "About Page")
+  form(action='/rules', method = "GET")
+    input(type="submit" name="gotoRules" values = "Rules Page")

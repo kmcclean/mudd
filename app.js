@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+//var mongoose = require('mongoose');
 
 var Keys = require('./keys');
 var Monster = require('./classes/Monsters');
@@ -13,7 +13,7 @@ var Room = require('./classes/Rooms');
 var Combat = require('./classes/Combat');
 var Weapon = require('./classes/Weapons');
 var Equipment = require('./classes/Equipment');
-var MonsterDB = require('./models/mudd');
+var MonsterDB = require('./models/monsters');
 var Twitter = require('twitter');
 
 var routes = require('./routes/index');
@@ -22,13 +22,11 @@ var app = express();
 
 
 
-mongoose.connect('mongodb://localhost:27017/monsters');
-
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  // we're connected!
-});
+//mongoose.connect('mongodb://localhost:27017/monsters');
+//var db = mongoose.connection;
+//db.on('error', console.error.bind(console, 'connection error:'));
+//db.once('open', function() {
+//});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -43,10 +41,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
+//app.use('/users', users);
 
 var key = new Keys();
-var room_has_monster = false;
 
 var player_index = [];
 //This sets up the twitter client so that it can respond to commands during the game.
@@ -64,7 +61,7 @@ function random_monster (which_monster) {
     return new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, .3, 2);
   }
 }
-//
+
 //client.stream('statuses/filter', {track: 'javascript'}, function(stream) {
 //  stream.on('data', function(tweet) {
 //    //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
@@ -112,7 +109,6 @@ while (true) {
   //if the hero is
   if (room_has_monster) {
     var monster = create_monster();
-    //var combat = create_room_combat();
     var fight = room_combat(hero, monster);
     if (fight) {
       var alive = end_combat(hero, monster);
@@ -153,8 +149,9 @@ function create_monster() {
   //these will be used to pull monsters from the database.
   var monster_choice = monster_array[random - 1];
   console.log("Monster choice: " + monster_choice);
-  return database_monster(monster_choice);
-  //return random_monster(random);
+  //var monster = database_monster(monster_choice);
+  //monster.get_monster_info();
+  return random_monster(random);
   //return monster;
 }
 
@@ -184,7 +181,11 @@ function end_combat(hero, monster){
 
 function new_room (hero) {
   //creates the room that the player has entered.
-  var room = new Room("You have entered a crypt.");
+
+  var possibleRooms = ["crypt", "meat locker", "cell", "sunken pit", "torture chamber"];
+  var random = Math.floor((Math.random() * possibleRooms.length) + 1);
+
+  var room = new Room("You have entered a " + possibleRooms[random] + ".");
   console.log(room.get_description());
 
   //This makes it so only half the rooms have monsters.
@@ -268,6 +269,7 @@ function room_combat(hero, monster){
 //this gets a monster from the database.
 function database_monster(monster_choice) {
 
+  console.log("Reaching database function");
   var monster = MonsterDB.find({name: monster_choice}, function (err, monster) {
     if (err) {
       console.log(err);
@@ -282,7 +284,6 @@ function database_monster(monster_choice) {
     console.log(monster.get_monster_info());
     return monster;
   });
-    return monster;
 }
 
 
