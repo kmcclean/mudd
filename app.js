@@ -86,66 +86,88 @@ var client = new Twitter({
 //  });
 //});
 
-function random_monster (which_monster) {
-  if (which_monster == 1) {
-    return new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
-  }
-  else if (which_monster == 2) {
-    return new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
-  }
-}
-
-var room_has_monster = false;
-var monster_alive = false;
-//var monster;
 //this is for testing purposes. once the methods are running correctly, this should taken out for the client stream above.
 while (true) {
 
   //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
   if (player_index.length == 0) {
-
     //creates a new hero and adds them to the index.
     var hero = new_player();
     player_index.push(hero);
   }
-  if (!room_has_monster && !monster_alive) {
-    room_has_monster = new_room();
-  }
-  if (room_has_monster && !monster_alive) {
-    var monster = create_monster();
-    monster_alive = true;
-    if (hero_attacks(hero, monster)) {
-      monster_defeated(hero, monster);
-      room_has_monster = false;
-      monster_alive = false;
+  if (new_room()) {
+
+    var monster_array = ["Orc", "Ogre"];
+    //This is where the monster is created.
+    //This is to select a random monster from the monsters that are available.
+    var random = Math.floor((Math.random() * monster_array.length) + 1);
+
+
+    var monster_choice = monster_array[random - 1];
+    console.log("Monster choice: " + monster_choice);
+    var monster;
+    if (monster_choice == 1) {
+      monster = new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
     }
-    else {
-      if (monster_attacks()) {
-        hero_defeated(hero);
+    else if (monster_choice == 2) {
+      monster = new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
+    }
+
+    while(true){
+      if(hero_attacks(hero, monster)){
+        monster_defeated();
+        break;
+      }
+      else if(monster_attacks(hero, monster)){
         hero_defeated(hero);
         player_index.pop();
         break;
       }
     }
+
   }
-  //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
-  //if the hero is
-  if (room_has_monster && monster_alive) {
-    if (hero_attacks(hero, monster)) {
-      monster_defeated(hero, monster);
-      room_has_monster = false;
-      monster_alive = false;
-    }
-    else {
-      if (monster_attacks()) {
-        hero_defeated(hero);
-        hero_defeated(hero);
-        player_index.pop();
-        break;
-      }
-    }
+  if(hero.get_hero_hit_points() <= 0){
+    break;
   }
 }
+
+  //This is code the will be used for a portion of the game that is not functioning yet.
+  //if (!room_has_monster && !monster_alive) {
+  //  room_has_monster = new_room();
+  //}
+  //if (room_has_monster && !monster_alive) {
+  //  var monster = create_monster();
+  //  monster_alive = true;
+  //  if (hero_attacks(hero, monster)) {
+  //    monster_defeated(hero, monster);
+  //    room_has_monster = false;
+  //    monster_alive = false;
+  //  }
+  //  else {
+  //    if (monster_attacks()) {
+  //      hero_defeated(hero);
+  //      hero_defeated(hero);
+  //      player_index.pop();
+  //      break;
+  //    }
+  //  }
+  //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
+  //if the hero is
+  //if (room_has_monster && monster_alive) {
+  //  if (hero_attacks(hero, monster)) {
+  //    monster_defeated(hero, monster);
+  //    room_has_monster = false;
+  //    monster_alive = false;
+  //  }
+  //  else {
+  //    if (monster_attacks()) {
+  //      hero_defeated(hero);
+  //      hero_defeated(hero);
+  //      player_index.pop();
+  //      break;
+  //    }
+  //  }
+  //}
 
 //this pulls a random test monster.
 
@@ -163,16 +185,35 @@ function new_player() {
   return hero;
 }
 
-function create_monster() {
+function create_monster(hero) {
   var monster_array = ["Orc", "Ogre"];
 
+  console.log(hero.get_hero_name());
   //This is to select a random monster from the monsters that are available.
   var random = Math.floor((Math.random() * monster_array.length) + 1);
 
   //these will be used to pull monsters from the database.
   var monster_choice = monster_array[random - 1];
   console.log("Monster choice: " + monster_choice);
-  return random_monster(random);
+  var monster;
+  if (monster_choice == 1) {
+    monster = new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
+  }
+  else if (monster_choice == 2) {
+    monster = new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
+  }
+  return combat(hero, monster);
+}
+
+function combat(hero, monster){
+  while (true){
+    if(hero_attacks()){
+      return monster_defeated()
+    }
+    else if(monster_attacks()){
+      return hero_defeated()
+    }
+  }
 }
 
 
@@ -183,8 +224,8 @@ function monster_defeated(hero, monster) {
   console.log("You have " + hero.hero_get_xp() + "xp.");
   if (hero.hero_level_up_check()) {
     console.log("You leveled up! You are now level " + hero.hero_get_level());
-    return true;
   }
+  return true;
 }
 
 function hero_defeated(hero) {
