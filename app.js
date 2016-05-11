@@ -6,25 +6,28 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-//var Keys = require('./keys');
+var Keys = require('./keys');
 var Monster = require('./classes/Monsters');
 var Hero = require('./classes/Hero');
-var DatabaseHero = require('./models/heroes.js');
 var Room = require('./classes/Rooms');
 var Combat = require('./classes/Combat');
 var Weapon = require('./classes/Weapons');
 var Equipment = require('./classes/Equipment');
+//var MonsterDB = require('./models/mudd');
 var Twitter = require('twitter');
-var monsterJSON = require('./monster_files/monsters');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var app = express();
 
 
+
 mongoose.connect('mongodb://localhost:27017/heroes');
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
+  // we're connected!
 });
 
 // view engine setup
@@ -40,220 +43,28 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-//app.use('/users', users);
+app.use('/users', users);
 
-//var key = new Keys();
+var key = new Keys();
+var room_has_monster = false;
 
 var player_index = [];
-
-
-while (true) {
-
-  //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
-  if (player_index.length == 0) {
-    //creates a new hero and adds them to the index.
-    var weapon = new Weapon("Long Sword", false, "regular", 6);
-
-    // creates an array of weapons to be used by the player in the game.
-    var all_weapons = [weapon];
-    //creates the hero
-    var hero = new Hero("Kevin", weapon, all_weapons);
-
-    //creates a new hero to add to the database.
-    var newDatabaseHero = new DatabaseHero({
-      name: hero.hero_get_name(),
-      score : -1
-    });
-
-    //saves the new hero to the database.
-    newDatabaseHero.save(function (err, data){
-      if(err){console.log(err)}
-      else{
-        console.log("Hero inserted: ", data);
-      }
-    });
-
-  //This sets up what room the player goes into.
-  var possibleRooms = ["crypt", "meat locker", "cell", "sunken pit", "torture chamber"];
-  var random = Math.floor((Math.random() * possibleRooms.length) + 1);
-
-  var room = new Room("You have entered a " + possibleRooms[random - 1] + ".");
-  console.log(room.get_description());
-
-  //This makes it so only half the rooms have monsters.
-  var is_monster = Math.floor((Math.random() * 2) + 1);
-
-  //This is where the combat occurs in the game, if there is a monster in the room.
-  if (is_monster == 1) {
-
-      var monster_array = ["Orc", "Ogre"];
-      //This is where the monster is created.
-      //This is to select a random monster from the monsters that are available.
-      var random = Math.floor((Math.random() * monster_array.length) + 1);
-
-      var monster_choice = monster_array[random - 1];
-      console.log("Monster choice: " + monster_choice);
-      var monster;
-      if (monster_choice == 1) {
-        monster = new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
-      }
-      else if (monster_choice == 2) {
-        monster = new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
-      }
-
-      while(true){
-        //the hero weapon happens here.
-        var attack_roll = hero.hero_attack_roll();
-        console.log("You rolled a " + attack_roll + "!");
-        var defense = monster.monster_get_defense();
-        if (attack_roll >= defense) {
-          console.log("You hit the " + monster.monster_get_name() + "!");
-          var hero_damage = hero.get_damage();
-          if (monster.monster_lose_hit_points(hero_damage) <= 0) {
-            console.log(monster.monster_get_name() + " has been defeated!");
-            break;
-          }
-          else {
-            console.log(monster.monster_get_name() + " has taken " + hero_damage + " points of damage!");
-            return false;
-          }
-        }
-        else {
-          console.log(hero.hero_get_name() + " attacked " + monster.monster_get_name() + " & missed!");
-          return false;
-        }
-        var monster_attack_roll = monster.monster_attack_roll();
-        console.log("The " + monster.monster_get_name() + " rolls a " + monster_attack_roll + "!");
-        if (monster_attack_roll >= hero.hero_get_defense()) {
-          console.log("The " + monster.monster_get_name() + " hit you, " + hero.hero_get_name() + ".");
-          var monster_damage = monster.monster_get_attack_damage();
-          hero.hero_lose_hit_points(monster_damage);
-          if (!hero.hero_is_alive()) {
-            break;
-          }
-          else {
-            console.log(hero.hero_get_name() + " has taken " + monster_damage + " points of damage!");
-          }
-        }
-        else {
-          console.log(monster.monster_get_name() + " attacked " + hero.hero_get_name() + " & missed!");
-        }
-        console.log(hero.hero_get_name() + " HP: " + hero.hero_get_hit_points());
-        console.log(monster.monster_get_name() + " HP: " + monster.monster_get_hit_points());
-
-      }
-      //This checks to see if the hero or the monster were defeated, and then continues the game.
-      if (monster.monster_get_hit_points() <= 0){
-        console.log("You have defeated the " + monster.monster_get_name()+ "in this room!");
-        console.log("You gained " + monster.monster_get_xp() + "xp!");
-        hero.hero_gain_xp(monster.monster_get_xp());
-        console.log("You have " + hero.hero_get_xp() + "xp.");
-        if (hero.hero_level_up_check()) {
-          console.log("You leveled up! You are now level " + hero.hero_get_level());
-        }
-      }
-      else if(hero.get_hero_hit_points() <= 0){
-        console.log("You have been defeated by the monsters in this room.");
-        console.log(hero.hero_get_name() + " has been defeated. This hero earned " + hero.hero_get_xp() + "xp.");
-        DatabaseHero.find({name: hero.hero_get_name()}, function(err, heroList){
-          for(var i = 0; i < heroList.length; i++){
-            if(heroList[i].score < 0){
-              heroList[i].score = hero.hero_get_xp();
-              heroList[i].save();
-            }
-          }
-        });
-      }
-        player_index.pop();
-        break;
-      }
-    }
-  else {
-    var is_treasure = Math.floor((Math.random() * 3) + 1);
-    if (is_treasure == 3) {
-      var equipment = new Equipment("Health Potion");
-      console.log("You found a " + equipment.equipment_get_name() + "!");
-      var hit_points = equipment.equipment_health_potion();
-      hero.hero_increase_hit_points(hit_points);
-      console.log("You gained " + hit_points + " hp! You now have " + hero.hero_get_hit_points() + " hp!");
-    }
-    //Weapons to be added later.
-    //else if (is_treasure == 2) {
-    //  console.log("You found a new weapon!");
-    //  return false;
-    //}
-    else {
-      console.log("There is nothing in this room.");
-    }
-    }
-}
-
-function new_player() {
-  //creates the weapon
-  var weapon = new Weapon("Long Sword", false, "regular", 6);
-
-  // creates an array of weapons to be used by the player in the game.
-  var all_weapons = [weapon];
-
-  //creates the hero
-  var hero = new Hero("Kevin", weapon, all_weapons);
-  console.log("Starting hp: " + hero.hero_get_hit_points());
-  return hero;
-}
-
-function new_room (hero) {
-  //creates the room that the player has entered.
-
-  var possibleRooms = ["crypt", "meat locker", "cell", "sunken pit", "torture chamber"];
-  var random = Math.floor((Math.random() * possibleRooms.length) + 1);
-
-  var room = new Room("You have entered a " + possibleRooms[random] + ".");
-  console.log(room.get_description());
-
-  //This makes it so only half the rooms have monsters.
-  var is_monster = Math.floor((Math.random() * 2) + 1);
-
-  //This is where the combat occurs in the game, if there is a monster in the room.
-  if (is_monster == 1) {
-    console.log("The room has a monster!");
-    return true;
-  }
-
-  //if there are no monsters in the room, the check here is performed to see if the hero finds any treasure in the room.
-  else {
-    var is_treasure = Math.floor((Math.random() * 3) + 1);
-    if (is_treasure == 3) {
-      var equipment = new Equipment("Health Potion");
-      console.log("You found a " + equipment.equipment_get_name() + "!");
-      var hit_points = equipment.equipment_health_potion();
-      hero.hero_increase_hit_points(hit_points);
-      console.log("You gained " + hit_points + " hp! You now have " + hero.hero_get_hit_points() + " hp!");
-      return false;
-    }
-    //Weapons to be added later.
-    //else if (is_treasure == 2) {
-    //  console.log("You found a new weapon!");
-    //  return false;
-    //}
-    else {
-      console.log("There is nothing in this room.");
-      return false;
-    }
-  }
-}
-
-
-/*
-*****EVERYTHING BELOW HERE IS FOR A VERSION THAT IS NOT FUNCTIONING PROPERLY AT THE MOMENT.******
 //This sets up the twitter client so that it can respond to commands during the game.
-//var client = new Twitter({
-//  consumer_key: key.get_consumer_key(),
-//  consumer_secret: key.get_consumer_secret(),
-//  access_token_key: key.get_access_token(),
-//  access_token_secret: key.get_access_secret()
-//});
-
-
+var client = new Twitter({
+  consumer_key: key.get_consumer_key(),
+  consumer_secret: key.get_consumer_secret(),
+  access_token_key: key.get_access_token(),
+  access_token_secret: key.get_access_secret()
+});
+function random_monster (which_monster) {
+  if (which_monster == 1) {
+    return new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, .2, 1);
+  }
+  if (which_monster == 2) {
+    return new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, .3, 2);
+  }
+}
+//
 //client.stream('statuses/filter', {track: 'javascript'}, function(stream) {
 //  stream.on('data', function(tweet) {
 //    //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
@@ -269,7 +80,7 @@ function new_room (hero) {
 //      //if the hero is
 //    if (room_has_monster) {
 //      var monster = create_monster();
-//      var fight = hero_attacks(hero, monster);
+//      var fight = room_combat(hero, monster);
 //      if (fight) {
 //        var alive = end_combat(hero, monster);
 //        if (alive) {
@@ -289,86 +100,33 @@ function new_room (hero) {
 
 //this is for testing purposes. once the methods are running correctly, this should taken out for the client stream above.
 while (true) {
-
-  //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
+//This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
   if (player_index.length == 0) {
+
     //creates a new hero and adds them to the index.
     var hero = new_player();
     player_index.push(hero);
   }
-  if (new_room()) {
-
-    var monster_array = ["Orc", "Ogre"];
-    //This is where the monster is created.
-    //This is to select a random monster from the monsters that are available.
-    var random = Math.floor((Math.random() * monster_array.length) + 1);
-
-
-    var monster_choice = monster_array[random - 1];
-    console.log("Monster choice: " + monster_choice);
-    var monster;
-    if (monster_choice == 1) {
-      monster = new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
-    }
-    else if (monster_choice == 2) {
-      monster = new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
-    }
-
-    while(true){
-      if(hero_attacks(hero, monster)){
-        monster_defeated();
-        break;
+  //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
+  room_has_monster = new_room(hero);
+  //if the hero is
+  if (room_has_monster) {
+    var monster = create_monster();
+    //var combat = create_room_combat();
+    var fight = room_combat(hero, monster);
+    if (fight) {
+      var alive = end_combat(hero, monster);
+      if (alive) {
+        room_has_monster = false;
       }
-      else if(monster_attacks(hero, monster)){
-        hero_defeated(hero);
+      else {
         player_index.pop();
         break;
       }
     }
-
-  }
-  if(hero.get_hero_hit_points() <= 0){
-    break;
   }
 }
 
-  //This is code the will be used for a portion of the game that is not functioning yet.
-  //if (!room_has_monster && !monster_alive) {
-  //  room_has_monster = new_room();
-  //}
-  //if (room_has_monster && !monster_alive) {
-  //  var monster = create_monster();
-  //  monster_alive = true;
-  //  if (hero_attacks(hero, monster)) {
-  //    monster_defeated(hero, monster);
-  //    room_has_monster = false;
-  //    monster_alive = false;
-  //  }
-  //  else {
-  //    if (monster_attacks()) {
-  //      hero_defeated(hero);
-  //      hero_defeated(hero);
-  //      player_index.pop();
-  //      break;
-  //    }
-  //  }
-  //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
-  //if the hero is
-  //if (room_has_monster && monster_alive) {
-  //  if (hero_attacks(hero, monster)) {
-  //    monster_defeated(hero, monster);
-  //    room_has_monster = false;
-  //    monster_alive = false;
-  //  }
-  //  else {
-  //    if (monster_attacks()) {
-  //      hero_defeated(hero);
-  //      hero_defeated(hero);
-  //      player_index.pop();
-  //      break;
-  //    }
-  //  }
-  //}
 
 //this pulls a random test monster.
 
@@ -386,63 +144,46 @@ function new_player() {
   return hero;
 }
 
-function create_monster(hero) {
+function create_monster() {
   var monster_array = ["Orc", "Ogre"];
 
-  console.log(hero.get_hero_name());
   //This is to select a random monster from the monsters that are available.
   var random = Math.floor((Math.random() * monster_array.length) + 1);
 
   //these will be used to pull monsters from the database.
   var monster_choice = monster_array[random - 1];
   console.log("Monster choice: " + monster_choice);
-  var monster;
-  if (monster_choice == 1) {
-    monster = new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, 1);
-  }
-  else if (monster_choice == 2) {
-    monster = new Monster("Ogre", 20, "Wind", "Fist", 4, 8, 3, "Close", 14, 2);
-  }
-  return combat(hero, monster);
+  //var monster = database_monster(monster_choice);
+  return random_monster(random);
 }
 
-function combat(hero, monster){
-  while (true){
-    if(hero_attacks()){
-      return monster_defeated()
+//combat occurs here. When the combat is complete, there is a check to see if the hero is still alive.
+function create_room_combat(hero, monster){
+  return new Combat(hero, monster);
+}
+
+function end_combat(hero, monster){
+    if (hero.hero_get_hit_points() > 0) {
+      console.log("You have defeated the monster in this room.");
+      console.log("You gained " + monster.monster_get_xp() + "xp!");
+      hero.hero_gain_xp(monster.monster_get_xp());
+      console.log("You have " + hero.hero_get_xp() + "xp.");
+      if (hero.hero_level_up_check()) {
+        console.log("You leveled up! You are now level " + hero.hero_get_level());
+      }
+      return true;
     }
-    else if(monster_attacks()){
-      return hero_defeated()
+    //Once the hero has been killed, this shows the final results of the dungeon crawl.
+    else {
+      console.log("You have been defeated by the monsters in this room.");
+      console.log(hero.hero_get_name() + " has been defeated. This hero earned " + hero.hero_get_xp() + "xp.");
+      return false;
     }
-  }
-}
-
-
-function monster_defeated(hero, monster) {
-  console.log("You have defeated the monsters in this room.");
-  console.log("You gained " + monster.monster_get_xp() + "xp!");
-  hero.hero_gain_xp(monster.monster_get_xp());
-  console.log("You have " + hero.hero_get_xp() + "xp.");
-  if (hero.hero_level_up_check()) {
-    console.log("You leveled up! You are now level " + hero.hero_get_level());
-  }
-  return true;
-}
-
-function hero_defeated(hero) {
-  //Once the hero has been killed, this shows the final results of the dungeon crawl.
-  console.log("You have been defeated by the monsters in this room.");
-  console.log(hero.hero_get_name() + " has been defeated. This hero earned " + hero.hero_get_xp() + "xp.");
-  return false;
 }
 
 function new_room (hero) {
   //creates the room that the player has entered.
-
-  var possibleRooms = ["crypt", "meat locker", "cell", "sunken pit", "torture chamber"];
-  var random = Math.floor((Math.random() * possibleRooms.length) + 1);
-
-  var room = new Room("You have entered a " + possibleRooms[random] + ".");
+  var room = new Room("You have entered a crypt.");
   console.log(room.get_description());
 
   //This makes it so only half the rooms have monsters.
@@ -477,9 +218,9 @@ function new_room (hero) {
   }
 }
 
-function hero_attacks(hero, monster) {
+function room_combat(hero, monster){
 
-  //the hero weapon happens here.
+  //the hero attack happens here.
   var attack_roll = hero.hero_attack_roll();
   console.log("You rolled a " + attack_roll + "!");
   if (attack_roll >= monster.monster_get_defense()) {
@@ -487,21 +228,18 @@ function hero_attacks(hero, monster) {
     var hero_damage = hero.get_damage();
     if (monster.monster_lose_hit_points(hero_damage) <= 0) {
       console.log(monster.monster_get_name() + " has been defeated!");
+      //return this.hero;
       return true;
     }
     else {
-      console.log(monster.monster_get_name() + " has taken " + hero_damage + " points of damage!");
-      return false;
+      console.log(monster.monster_get_name() + " has taken " + hero_damage + " points of damage!")
     }
   }
   else {
     console.log(hero.hero_get_name() + " attacked " + monster.monster_get_name() + " & missed!");
-    return false;
   }
-}
 
-function monster_attacks(hero, monster){
-  //if the monster survives the weapon, it gets to weapon here.
+  //if the monster survives the attack, it gets to attack here.
   var monster_attack_roll = monster.monster_attack_roll();
   console.log("The " + monster.monster_get_name() + " rolls a " + monster_attack_roll + ".");
   if (monster_attack_roll >= hero.hero_get_defense()) {
@@ -510,10 +248,11 @@ function monster_attacks(hero, monster){
     hero.hero_lose_hit_points(monster_damage);
     if (!hero.hero_is_alive()) {
       return true;
+      //return this.hero;
     }
     else {
       console.log(hero.hero_get_name() + " has taken " + monster_damage + " points of damage!");
-      return false;
+
     }
   }
   else {
@@ -523,7 +262,28 @@ function monster_attacks(hero, monster){
   console.log(monster.monster_get_name() + " HP: " + monster.monster_get_hit_points());
   return false;
 }
-*/
+
+//this gets a monster from the database.
+function database_monster(monster_choice) {
+
+  var monster = MonsterDB.find({name: monster_choice}, function (err, monster) {
+    if (err) {
+      console.log(err);
+      return false;
+    }
+    //If no monster found, then send message to app error handler
+    if (!monster) {
+      console.log('No monster found with name ' + monster_choice);
+      return false;
+    }
+    var monster =  new Monster(monster.name, monster.hit_points, monster.weakness, monster.attack, monster.attack_bonus, monster.damage_die, monster.damage_bonus, monster.attack_type, monster.defense, monster.follow_chance, monster.experience_points);
+    console.log(monster.get_monster_info());
+    return monster;
+  });
+    return monster;
+}
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
