@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-var Keys = require('./keys');
+//var Keys = require('./keys');
 var Monster = require('./classes/Monsters');
 var Hero = require('./classes/Hero');
 var Room = require('./classes/Rooms');
@@ -45,17 +45,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-var key = new Keys();
+//var key = new Keys();
 var room_has_monster = false;
 
 var player_index = [];
 //This sets up the twitter client so that it can respond to commands during the game.
-var client = new Twitter({
-  consumer_key: key.get_consumer_key(),
-  consumer_secret: key.get_consumer_secret(),
-  access_token_key: key.get_access_token(),
-  access_token_secret: key.get_access_secret()
-});
+//var client = new Twitter({
+//  consumer_key: key.get_consumer_key(),
+//  consumer_secret: key.get_consumer_secret(),
+//  access_token_key: key.get_access_token(),
+//  access_token_secret: key.get_access_secret()
+//});
 function random_monster (which_monster) {
   if (which_monster == 1) {
     return new Monster("Orc", 8, "Fire", "Club", 3, 6, 2, "Close", 9, .2, 1);
