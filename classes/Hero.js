@@ -15,7 +15,7 @@ Hero = function (name, current_weapon, weapons_array) {
 
     this.level = 1;
     this.experience_points = 0;
-    this.attack = 3 * this.level;
+    this.weapon = 3 * this.level;
     this.defense = 7 + (3*this.level);
     this.hit_points = 11;
 };
@@ -23,7 +23,7 @@ Hero = function (name, current_weapon, weapons_array) {
 //this gets the basic info on the hero.
 Hero.prototype.get_hero_info  = function (){
     console.log("Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
-    "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
+    "\nAttack: " + this.weapon + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
     "\nFollow Chance: " + this.follow_chance);
 };
 
@@ -44,10 +44,10 @@ Hero.prototype.hero_get_name = function(){
     return this.name;
 };
 
-//This is where the attack roll for the hero occurs.
+//This is where the weapon roll for the hero occurs.
 Hero.prototype.hero_attack_roll = function(){
     var attack_roll = Math.floor((Math.random() * 20) + 1);
-    var attack_result = attack_roll + this.attack;
+    var attack_result = attack_roll + this.weapon;
     return attack_result
 };
 

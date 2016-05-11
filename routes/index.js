@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Heroes = require('../models/heroes.js');
-mongoose.connect('mongodb://localhost:27017/heroes');
-var db = mongoose.connection;
+//mongoose.connect('mongodb://localhost:27017/heroes');
+//var db = mongoose.connection;
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
@@ -31,8 +31,7 @@ router.get('/', function(req, res, next) {
       var score = scoreList[k];
       for (var l=0; l < deadHeroes.length; l++){
         if (deadHeroes[l].score == score){
-          hero = {name: deadHeroes[l].name, score:deadHeroes[l].score};
-          valhalla.push(hero);
+          valhalla.push(deadHeroes[l]);
           counter++;
         }
       }
@@ -50,6 +49,11 @@ router.get('/about', function(req, res, next) {
 
 router.get('/rules', function(req, res, next){
   res.render('rules');
+});
+
+router.post('/', function(req, res, next){
+
+  res.redirect('/');
 });
 
 

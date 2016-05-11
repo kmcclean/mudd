@@ -7,7 +7,7 @@ Combat = function(hero, monster){
 //This is where the combat happens in individual rooms.
 Combat.prototype.room_combat = function (hero, monster) {
 
-    //the hero attack happens here.
+    //the hero weapon happens here.
     var attack_roll = hero.hero_attack_roll();
     console.log("You rolled a " + attack_roll + "!");
     if (attack_roll >= monster.monster_get_defense()) {
@@ -26,7 +26,7 @@ Combat.prototype.room_combat = function (hero, monster) {
         console.log(hero.hero_get_name() + " attacked " + monster.monster_get_name() + " & missed!");
     }
 
-    //if the monster survives the attack, it gets to attack here.
+    //if the monster survives the weapon, it gets to weapon here.
     var monster_attack_roll = monster.monster_attack_roll();
     console.log("The " + monster.monster_get_name() + " rolls a " + monster_attack_roll + ".");
     if (monster_attack_roll >= hero.hero_get_defense()) {

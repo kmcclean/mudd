@@ -3,24 +3,23 @@
  */
 
 //this creates the monster.
-Monster = function (name, hit_points, weakness, attack, attack_bonus, damage_die, damage_bonus, attack_type, defense, follow_chance, xp) {
+Monster = function (name, hit_points, weakness, weapon, attack_bonus, damage_die, damage_bonus, attack_type, defense, xp) {
     this.name = name;
     this.hit_points = hit_points;
     this.weakness = weakness;
-    this.attack = attack;
+    this.weapon = weapon;
     this.attack_bonus = attack_bonus;
     this.damage_die = damage_die;
     this.damage_bonus = damage_bonus;
     this.attack_type = attack_type;
     this.defense = defense;
-    this.follow_chance = follow_chance;
     this.experience_points = xp;
 };
 
 //This prints out the basic statistics on the monster.
 Monster.prototype.get_monster_info  = function() {
     console.log("Name: " + this.name + "\nHit Points: " + this.hit_points + "\nWeakness: " + this.weakness +
-        "\nAttack: " + this.attack + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
+        "\nAttack: " + this.weapon + "\nAttack_Type: " + this.attack_type + "\nDefense: " + this.defense +
         "\nFollow Chance: " + this.follow_chance);
 };
 
@@ -50,9 +49,9 @@ Monster.prototype.monster_get_weakness = function(){
     return this.weakness;
 };
 
-//Gets the monster's attack.
+//Gets the monster's weapon.
 Monster.prototype.monster_get_attack = function(){
-    return this.attack;
+    return this.weapon;
 };
 
 //gets the monster's bonus when attacking.
@@ -70,7 +69,7 @@ Monster.prototype.monster_get_damage_die = function(){
     return this.damage_die;
 };
 
-//returns the monster's attack type.
+//returns the monster's weapon type.
 Monster.prototype.monster_get_attack_type = function(){
     return this.attack_type;
 };
@@ -93,7 +92,7 @@ Monster.prototype.monster_get_xp = function(){
     return this.experience_points;
 };
 
-//This figures out what the total of the attack roll made by the monster is.
+//This figures out what the total of the weapon roll made by the monster is.
 Monster.prototype.monster_attack_roll = function(){
     var attack_roll = Math.floor((Math.random() * 20) + 1);
     var attack_result = attack_roll + this.attack_bonus;

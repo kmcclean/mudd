@@ -1,9 +1,11 @@
 extends layout
+head
+  script(src="./public/javascripts/playerSearch.js")
 
 block content
   p
-    h1 Foolish mortal, I am the Evil Dungeon!!!
-  p Below are the list of heroes who have paid the price for daring to adventure into my depths.
+    h1 Foolish mortal, I art the Evil Dungeon!!!
+  p Below ist the list of heroes who have paid their price for daring to adventure into my depths.
     .hallOfFame
       table
         tr
@@ -21,7 +23,17 @@ block content
           tr
             td #{hero.name}
   hr
-  form(action='/about', method = "GET" name=gotoAbout)
+
+  p If thou dare, hunt among the bones of the doomed and soon-doomed for those thou recognize.
+  input(id= "search_string", value="Player Name")
+  button.find_hero(player_name = "search_string", ) Find Hero
+
+  .showHeroSearch
+    table(id = "hero_search_table")
+
+  hr
+  form(action='/about', method = "GET" name="gotoAbout")
     input(type="submit" value = "About")
+  br
   form(action='/rules', method = "GET" name="gotoRules")
     input(type="submit" value = "Rules")
