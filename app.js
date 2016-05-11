@@ -99,6 +99,8 @@ function random_monster (which_monster) {
 //});
 
 //this is for testing purposes. once the methods are running correctly, this should taken out for the client stream above.
+var room_has_monster = false;
+var monster_in_room = false;
 while (true) {
 //This checks to see if a player is currently playing. If not, it allows them to play. If it does, it continues with the current game.
   if (player_index.length == 0) {
@@ -108,16 +110,24 @@ while (true) {
     player_index.push(hero);
   }
   //this checks to see if a room has a monster in it. If it doesn't, the next time this is activated the hero will move to the next room.
-  room_has_monster = new_room(hero);
-  //if the hero is
-  if (room_has_monster) {
+  if(!room_has_monster && !monster_in_room){
+    room_has_monster = new_room(hero);
+  }
+
+  if (room_has_monster && !monster_in_room){
     var monster = create_monster();
+    monster_in_room = true;
+  }
+
+  //if the hero is
+  if (room_has_monster && monster_in_room) {
     //var combat = create_room_combat();
     var fight = room_combat(hero, monster);
     if (fight) {
       var alive = end_combat(hero, monster);
       if (alive) {
         room_has_monster = false;
+        monster_in_room = false;
       }
       else {
         player_index.pop();
