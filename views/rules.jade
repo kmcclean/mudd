@@ -1,11 +1,12 @@
 extends layout
 
+//This shows the player the rules for using the mudd.
 block content
     p In order to play, tweet "play" to the evil dungeon mudd on Twitter. Then, tweet one of the following commands in order to play the game
     p "Fight": This allows you to attack the monster in the room with you.
-    p "Flee": This allows you to run out of a room with a monster in it. If
+    p "Flee": This allows you to run out of a room with a monster in it. The monster will continue to attack you as you leave until it misses you.
     p "Leave": This allows you to move out of an empty room.
     p Any incorrect command will cause the monster will attack you. The monster will also attack if it gets bored (i.e. you take too long to issue a command).
 
-    form(submit='/', method = "GET")
-        input(type="submit" name="gotoRules" values = "Home Page")
+    form(action='/', method = "GET", name="gotoHomePage")
+        input(type="submit", value = "Home Page")

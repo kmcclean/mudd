@@ -1,8 +1,9 @@
 extends layout
 
+//This will show the user the details of the project.
 block content
     p This is the final assignment for Web Programming and Design. It is a mudd that will eventually be playable on Twitter.
     p Built by Kevin McClean.
 
-    form(submit='/', method = "GET")
-        input(type="submit" name="gotoRules" values = "Home Page")
+    form(action='/', method = "GET", name="gotoHomePage")
+        input(type="submit", value = "Home Page")

@@ -40,13 +40,8 @@ router.get('/', function(req, res, next) {
         break;
       }
     }
-
-
-
     return res.render('index', { title: 'Welcome to the Evil Dungeon', highscores: valhalla, stillPlaying: stillInDungeon});
   });
-
-
 });
 
 router.get('/about', function(req, res, next) {

@@ -7,22 +7,21 @@ block content
     .hallOfFame
       table
         tr
-          td Hero
-          td Score
+            th Hero
+            th Score
         for hero in highscores
-          tr #{hero.name}
-          tr #{hero.score}
-          br
+          tr
+            td #{hero.name}
+            td #{hero.score}
     p See the valiant fools who still struggle hopelessly!
     .heroesPlaying
       table
-        tr
-          td Hero
+        tr: th Hero
         for hero in stillPlaying
-          tr #{hero.name}
-          br
+          tr
+            td #{hero.name}
   hr
-  form(action='/about', method = "GET")
-    input(type="submit" name="gotoAbout" values = "About Page")
-  form(action='/rules', method = "GET")
-    input(type="submit" name="gotoRules" values = "Rules Page")
+  form(action='/about', method = "GET" name=gotoAbout)
+    input(type="submit" value = "About")
+  form(action='/rules', method = "GET" name="gotoRules")
+    input(type="submit" value = "Rules")

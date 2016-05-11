@@ -5,5 +5,5 @@ block content
   h2= error.status
   pre #{error.stack}
 
-  form(submit='/', method = "GET")
-    input(type="submit" name="gotoRules" values = "Home Page")
+  form(action='/', method = "GET" name="gotoHomePage")
+    input(type="submit"  value = "Home Page")
